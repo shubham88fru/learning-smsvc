@@ -2,10 +2,13 @@ package org.learning.smsvc.account.service.impl;
 
 import lombok.AllArgsConstructor;
 import org.learning.smsvc.account.constants.AccountsConstants;
+import org.learning.smsvc.account.dto.AccountsDTO;
 import org.learning.smsvc.account.dto.CustomerDTO;
 import org.learning.smsvc.account.entity.Accounts;
 import org.learning.smsvc.account.entity.Customer;
 import org.learning.smsvc.account.exception.CustomerAlreadyExistException;
+import org.learning.smsvc.account.exception.ResourceNotFoundException;
+import org.learning.smsvc.account.mapper.AccountsMapper;
 import org.learning.smsvc.account.mapper.CustomerMapper;
 import org.learning.smsvc.account.repository.IAccountsRepository;
 import org.learning.smsvc.account.repository.ICustomerRepository;
@@ -50,5 +53,22 @@ public class AccountServiceImpl implements IAccountsService {
         account.setCreatedAt(LocalDateTime.now());
         account.setCreatedBy("Anonymous");
         return account;
+    }
+
+
+    @Override
+    public CustomerDTO fetchAccount(String mobileNumber) {
+        Customer customer = customerRepository.findByMobileNumber(mobileNumber).orElseThrow(
+                () -> new ResourceNotFoundException("Customer", "mobileNumber", mobileNumber)
+        );
+
+        Accounts accounts = accountsRepository.findByCustomerId(customer.getCustomerId()).orElseThrow(
+                () -> new ResourceNotFoundException("Account", "customerId", customer.getCustomerId().toString())
+        );
+
+        CustomerDTO customerDTO = CustomerMapper.mapToCustomerDTO(customer, new CustomerDTO());
+        customerDTO.setAccountsDTO(AccountsMapper.mapToAccountsDTO(accounts, new AccountsDTO()));
+
+        return customerDTO;
     }
 }
