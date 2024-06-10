@@ -15,7 +15,6 @@ import org.learning.smsvc.account.repository.ICustomerRepository;
 import org.learning.smsvc.account.service.IAccountsService;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Random;
 
@@ -37,8 +36,6 @@ public class AccountServiceImpl implements IAccountsService {
         }
 
         Customer customer = CustomerMapper.mapToCustomer(customerDTO, new Customer());
-        customer.setCreatedAt(LocalDateTime.now());
-        customer.setCreatedBy("Anonymous");
         Customer savedCustomer = customerRepository.save(customer);
         accountsRepository.save(createNewAccount(savedCustomer));
     }
@@ -50,8 +47,6 @@ public class AccountServiceImpl implements IAccountsService {
         account.setAccountNumber(randAccNumber);
         account.setAccountType(AccountsConstants.SAVINGS);
         account.setBranchAddress(AccountsConstants.ADDRESS);
-        account.setCreatedAt(LocalDateTime.now());
-        account.setCreatedBy("Anonymous");
         return account;
     }
 
